@@ -18,18 +18,36 @@ import javax.swing.ImageIcon;
  * @author Ander
  */
 public class ResourcesReader {
-    public Map<String, ImageIcon> getIcons() {
-        final Map<String, ImageIcon> resourceMap = new HashMap<>();
-        final File dir = new File(getClass().getClassLoader().getResource("resources/images").getPath());
+    
+    private static ResourcesReader instance;
+    
+    private ResourcesReader() {
         
-        for (File f : dir.listFiles()) {
-            try {
-                resourceMap.put(f.getName(), new ImageIcon(ImageIO.read(f)));
-            } catch (IOException ex) {
-                Logger.getLogger(ResourcesReader.class.getName()).log(Level.SEVERE, null, ex);
-            }
+    }
+    
+    public static ResourcesReader getInstance() {
+        if (instance == null) {
+            instance = new ResourcesReader();
         }
-        
-        return resourceMap;
+        return instance;
+    }
+    
+    private Map<String, ImageIcon> icons;
+    
+    public Map<String, ImageIcon> getIcons() {
+        if (this.icons == null) {
+            final Map<String, ImageIcon> resourceMap = new HashMap<>();
+            final File dir = new File(getClass().getClassLoader().getResource("resources/images").getPath());
+
+            for (File f : dir.listFiles()) {
+                try {
+                    resourceMap.put(f.getName().substring(0, f.getName().lastIndexOf(".")), new ImageIcon(ImageIO.read(f)));
+                } catch (IOException ex) {
+                    Logger.getLogger(ResourcesReader.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            this.icons = resourceMap;
+        }
+        return this.icons;
     }
 }

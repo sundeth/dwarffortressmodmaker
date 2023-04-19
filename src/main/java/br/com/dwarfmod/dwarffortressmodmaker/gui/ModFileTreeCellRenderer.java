@@ -29,7 +29,7 @@ public class ModFileTreeCellRenderer extends DefaultTreeCellRenderer {
     private Map<String, ImageIcon> iconMap;
     
     public ModFileTreeCellRenderer() {
-        final ResourcesReader reader = new ResourcesReader();
+        final ResourcesReader reader = ResourcesReader.getInstance();
         this.iconMap = reader.getIcons();
     }
     

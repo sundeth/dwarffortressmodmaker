@@ -8,6 +8,7 @@ import br.com.dwarfmod.dwarffortressmodmaker.gui.library.OccurrenceLibraryWindow
 import br.com.dwarfmod.dwarffortressmodmaker.gui.library.TokenLibraryWindow;
 import br.com.dwarfmod.dwarffortressmodmaker.core.ModManager;
 import br.com.dwarfmod.dwarffortressmodmaker.core.ModWritter;
+import br.com.dwarfmod.dwarffortressmodmaker.core.ResourcesReader;
 import br.com.dwarfmod.dwarffortressmodmaker.data.Mod;
 import br.com.dwarfmod.dwarffortressmodmaker.data.ModType;
 import br.com.dwarfmod.dwarffortressmodmaker.utils.Constants;
@@ -80,6 +81,13 @@ public class MainWindow extends javax.swing.JFrame {
         modIdLabel = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         modRawTree = new br.com.dwarfmod.dwarffortressmodmaker.gui.ModRawTree();
+        jToolBar1 = new javax.swing.JToolBar();
+        addRawButton = new javax.swing.JButton();
+        editRawButton = new javax.swing.JButton();
+        deleteRawButton = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
+        copyRawButton = new javax.swing.JButton();
+        pasteRawButton = new javax.swing.JButton();
         modSaveButton = new javax.swing.JButton();
         modUndoButton = new javax.swing.JButton();
         modUpdateLocalButton = new javax.swing.JButton();
@@ -97,7 +105,8 @@ public class MainWindow extends javax.swing.JFrame {
         jMenuItem6 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle(StringLibrary.APP_NAME);
+        setTitle(StringLibrary.APP_NAME + " - " + Constants.VERSION);
+        setIconImage(ResourcesReader.getInstance().getIcons().get("icon").getImage());
         setResizable(false);
 
         leftMainPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Mod List"));
@@ -157,7 +166,7 @@ public class MainWindow extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        rightMainPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        rightMainPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Mod Data"));
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Mod Info"));
 
@@ -234,15 +243,74 @@ public class MainWindow extends javax.swing.JFrame {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Raw Files"));
 
+        jToolBar1.setRollover(true);
+
+        addRawButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_new.png"))); // NOI18N
+        addRawButton.setBorder(null);
+        addRawButton.setFocusable(false);
+        addRawButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        addRawButton.setMaximumSize(new java.awt.Dimension(20, 20));
+        addRawButton.setMinimumSize(new java.awt.Dimension(20, 20));
+        addRawButton.setPreferredSize(new java.awt.Dimension(20, 20));
+        addRawButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(addRawButton);
+
+        editRawButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_edit.png"))); // NOI18N
+        editRawButton.setBorder(null);
+        editRawButton.setFocusable(false);
+        editRawButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        editRawButton.setMaximumSize(new java.awt.Dimension(20, 20));
+        editRawButton.setMinimumSize(new java.awt.Dimension(20, 20));
+        editRawButton.setPreferredSize(new java.awt.Dimension(20, 20));
+        editRawButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(editRawButton);
+
+        deleteRawButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_delete.png"))); // NOI18N
+        deleteRawButton.setBorder(null);
+        deleteRawButton.setFocusable(false);
+        deleteRawButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        deleteRawButton.setMaximumSize(new java.awt.Dimension(20, 20));
+        deleteRawButton.setMinimumSize(new java.awt.Dimension(20, 20));
+        deleteRawButton.setPreferredSize(new java.awt.Dimension(20, 20));
+        deleteRawButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(deleteRawButton);
+        jToolBar1.add(jSeparator1);
+
+        copyRawButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_copy.png"))); // NOI18N
+        copyRawButton.setBorder(null);
+        copyRawButton.setFocusable(false);
+        copyRawButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        copyRawButton.setMaximumSize(new java.awt.Dimension(20, 20));
+        copyRawButton.setMinimumSize(new java.awt.Dimension(20, 20));
+        copyRawButton.setPreferredSize(new java.awt.Dimension(20, 20));
+        copyRawButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(copyRawButton);
+
+        pasteRawButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_paste.png"))); // NOI18N
+        pasteRawButton.setBorder(null);
+        pasteRawButton.setFocusable(false);
+        pasteRawButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        pasteRawButton.setMaximumSize(new java.awt.Dimension(20, 20));
+        pasteRawButton.setMinimumSize(new java.awt.Dimension(20, 20));
+        pasteRawButton.setPreferredSize(new java.awt.Dimension(20, 20));
+        pasteRawButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(pasteRawButton);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(modRawTree, javax.swing.GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)
+            .addComponent(modRawTree, javax.swing.GroupLayout.DEFAULT_SIZE, 434, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(modRawTree, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(modRawTree, javax.swing.GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE))
         );
 
         modSaveButton.setText("Save");
@@ -302,7 +370,7 @@ public class MainWindow extends javax.swing.JFrame {
             .addGroup(rightMainPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(rightMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -401,9 +469,9 @@ public class MainWindow extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(rightMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(leftMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -484,7 +552,11 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addRawButton;
+    private javax.swing.JButton copyRawButton;
     private javax.swing.JButton deleteModJButton;
+    private javax.swing.JButton deleteRawButton;
+    private javax.swing.JButton editRawButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -503,6 +575,8 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JToolBar.Separator jSeparator1;
+    private javax.swing.JToolBar jToolBar1;
     private javax.swing.JPanel leftMainPanel;
     private javax.swing.JLabel modAuthorLabel;
     private javax.swing.JLabel modDescriptionLabel;
@@ -516,6 +590,7 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JButton modUpdateLocalButton;
     private javax.swing.JLabel modVersionLabel;
     private javax.swing.JButton newModJButton;
+    private javax.swing.JButton pasteRawButton;
     private javax.swing.JPanel rightMainPanel;
     // End of variables declaration//GEN-END:variables
 
@@ -674,6 +749,10 @@ public class MainWindow extends javax.swing.JFrame {
         this.modUndoButton.setEnabled(enabled);
         this.modUpdateLocalButton.setEnabled(enabled);
         this.modPublishButton.setEnabled(enabled);
+        
+        this.addRawButton.setEnabled(enabled);
+        this.editRawButton.setEnabled(enabled);
+        this.deleteRawButton.setEnabled(enabled);
     }
     
     //***********************************************************************************************************************************************************************

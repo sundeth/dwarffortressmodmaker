@@ -5,6 +5,7 @@
 package br.com.dwarfmod.dwarffortressmodmaker.gui.library;
 
 import br.com.dwarfmod.dwarffortressmodmaker.core.ModManager;
+import br.com.dwarfmod.dwarffortressmodmaker.core.ResourcesReader;
 import br.com.dwarfmod.dwarffortressmodmaker.data.library.Occurrence;
 import br.com.dwarfmod.dwarffortressmodmaker.data.library.OccurrenceLibrary;
 import br.com.dwarfmod.dwarffortressmodmaker.gui.MainWindow;
@@ -48,6 +49,7 @@ public class OccurrenceLibraryWindow extends javax.swing.JFrame {
         occurrenceList = new javax.swing.JList<>();
 
         setTitle("Ocurrence Library");
+        setIconImage(ResourcesReader.getInstance().getIcons().get("icon_ocu").getImage());
 
         jLabel1.setText("Search");
 

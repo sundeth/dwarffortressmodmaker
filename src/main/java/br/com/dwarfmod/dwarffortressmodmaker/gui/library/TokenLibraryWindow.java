@@ -5,6 +5,7 @@
 package br.com.dwarfmod.dwarffortressmodmaker.gui.library;
 
 import br.com.dwarfmod.dwarffortressmodmaker.core.ModManager;
+import br.com.dwarfmod.dwarffortressmodmaker.core.ResourcesReader;
 import br.com.dwarfmod.dwarffortressmodmaker.data.RawFileTypeEnum;
 import br.com.dwarfmod.dwarffortressmodmaker.data.library.Token;
 import br.com.dwarfmod.dwarffortressmodmaker.gui.MainWindow;
@@ -63,6 +64,7 @@ public class TokenLibraryWindow extends javax.swing.JFrame {
         addTokenButton = new javax.swing.JButton();
 
         setTitle("Token Library");
+        setIconImage(ResourcesReader.getInstance().getIcons().get("icon_token").getImage());
 
         jLabel1.setText("Object Class");
 

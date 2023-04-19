@@ -9,6 +9,8 @@ package br.com.dwarfmod.dwarffortressmodmaker.utils;
  * @author Ander
  */
 public class Constants {
+    public static final String VERSION = "2.1";
+    
     public static final String VANILLA_FOLDER = "//data//vanilla";
     public static final String MODS_FOLDER = "//mods";
     public static final String STEAM_FOLDER = "//mods//mod_upload";
