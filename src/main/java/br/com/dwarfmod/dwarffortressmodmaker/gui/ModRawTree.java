@@ -17,6 +17,7 @@ public class ModRawTree extends javax.swing.JPanel {
      */
     public ModRawTree() {
         initComponents();
+        this.getTree().setRootVisible(false);
     }
 
     /**
@@ -32,7 +33,7 @@ public class ModRawTree extends javax.swing.JPanel {
         rawTreeModel = new javax.swing.JTree();
 
         rawTreeModel.setModel(null);
-        rawTreeModel.setCellRenderer(new ModFileTreeCellRenderer());
+        rawTreeModel.setToggleClickCount(1);
         jScrollPane1.setViewportView(rawTreeModel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

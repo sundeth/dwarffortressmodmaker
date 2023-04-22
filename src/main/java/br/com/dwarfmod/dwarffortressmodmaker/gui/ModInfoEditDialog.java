@@ -8,7 +8,6 @@ import br.com.dwarfmod.dwarffortressmodmaker.core.ModManager;
 import br.com.dwarfmod.dwarffortressmodmaker.data.Mod;
 import br.com.dwarfmod.dwarffortressmodmaker.data.ModType;
 import br.com.dwarfmod.dwarffortressmodmaker.utils.Constants;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.io.File;
 import java.util.Arrays;
@@ -16,10 +15,6 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 /**
  *

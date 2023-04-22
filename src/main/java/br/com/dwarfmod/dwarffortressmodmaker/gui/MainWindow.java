@@ -4,25 +4,41 @@
  */
 package br.com.dwarfmod.dwarffortressmodmaker.gui;
 
+import br.com.dwarfmod.dwarffortressmodmaker.gui.creation.RawFileCreatorWindow;
 import br.com.dwarfmod.dwarffortressmodmaker.gui.library.OccurrenceLibraryWindow;
 import br.com.dwarfmod.dwarffortressmodmaker.gui.library.TokenLibraryWindow;
 import br.com.dwarfmod.dwarffortressmodmaker.core.ModManager;
 import br.com.dwarfmod.dwarffortressmodmaker.core.ModWritter;
+import br.com.dwarfmod.dwarffortressmodmaker.core.RawFileReader;
 import br.com.dwarfmod.dwarffortressmodmaker.core.ResourcesReader;
 import br.com.dwarfmod.dwarffortressmodmaker.data.Mod;
 import br.com.dwarfmod.dwarffortressmodmaker.data.ModType;
+import br.com.dwarfmod.dwarffortressmodmaker.data.RawFile;
+import br.com.dwarfmod.dwarffortressmodmaker.data.RawFileTypeEnum;
+import br.com.dwarfmod.dwarffortressmodmaker.data.RawObject;
 import br.com.dwarfmod.dwarffortressmodmaker.utils.Constants;
 import br.com.dwarfmod.dwarffortressmodmaker.utils.StringLibrary;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.TreeSet;
 import java.util.stream.Stream;
+import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SerializationUtils;
 
 /**
  *
@@ -36,6 +52,9 @@ public class MainWindow extends javax.swing.JFrame {
     
     private final TokenLibraryWindow tokenLibrary;
     private final OccurrenceLibraryWindow occurrenceLibrary;
+    private RawFile copyRawFileData;
+    private RawObject copyRawObjectData;
+    private final RawFileCreatorWindow rawCreator;
     
     /**
      * Creates new form MainWindow
@@ -44,14 +63,18 @@ public class MainWindow extends javax.swing.JFrame {
     public MainWindow(final ModManager manager) {
         this.tokenLibrary = new TokenLibraryWindow(this, manager);
         this.occurrenceLibrary = new OccurrenceLibraryWindow(this, manager);
+        this.rawCreator = new RawFileCreatorWindow(this, manager);
         
         this.manager = manager;
         this.manager.initialize();
         
         this.initComponents();
         this.centerScreen();
+        this.enableEdit(false);
         
         this.fillModList();
+        
+        this.addTreeCopyPaste();
     }
 
     /**
@@ -88,10 +111,13 @@ public class MainWindow extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JToolBar.Separator();
         copyRawButton = new javax.swing.JButton();
         pasteRawButton = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JToolBar.Separator();
+        navigateRawToogleButton = new javax.swing.JToggleButton();
         modSaveButton = new javax.swing.JButton();
         modUndoButton = new javax.swing.JButton();
         modUpdateLocalButton = new javax.swing.JButton();
         modPublishButton = new javax.swing.JButton();
+        openModFolderButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -103,9 +129,15 @@ public class MainWindow extends javax.swing.JFrame {
         jMenuItem7 = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenuItem8 = new javax.swing.JMenuItem();
+        jMenuItem9 = new javax.swing.JMenuItem();
+        jMenuItem10 = new javax.swing.JMenuItem();
+        jMenuItem12 = new javax.swing.JMenuItem();
+        jMenuItem11 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle(StringLibrary.APP_NAME + " - " + Constants.VERSION);
+        setTitle(StringLibrary.APP_NAME + " - " + StringLibrary.APP_VERSION);
         setIconImage(ResourcesReader.getInstance().getIcons().get("icon").getImage());
         setResizable(false);
 
@@ -246,6 +278,7 @@ public class MainWindow extends javax.swing.JFrame {
         jToolBar1.setRollover(true);
 
         addRawButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_new.png"))); // NOI18N
+        addRawButton.setToolTipText("Create a new raw object");
         addRawButton.setBorder(null);
         addRawButton.setFocusable(false);
         addRawButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -253,9 +286,15 @@ public class MainWindow extends javax.swing.JFrame {
         addRawButton.setMinimumSize(new java.awt.Dimension(20, 20));
         addRawButton.setPreferredSize(new java.awt.Dimension(20, 20));
         addRawButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        addRawButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addRawButtonActionPerformed(evt);
+            }
+        });
         jToolBar1.add(addRawButton);
 
         editRawButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_edit.png"))); // NOI18N
+        editRawButton.setToolTipText("Edit the selected raw");
         editRawButton.setBorder(null);
         editRawButton.setFocusable(false);
         editRawButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -263,9 +302,15 @@ public class MainWindow extends javax.swing.JFrame {
         editRawButton.setMinimumSize(new java.awt.Dimension(20, 20));
         editRawButton.setPreferredSize(new java.awt.Dimension(20, 20));
         editRawButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        editRawButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editRawButtonActionPerformed(evt);
+            }
+        });
         jToolBar1.add(editRawButton);
 
         deleteRawButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_delete.png"))); // NOI18N
+        deleteRawButton.setToolTipText("Delete the selected raw");
         deleteRawButton.setBorder(null);
         deleteRawButton.setFocusable(false);
         deleteRawButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -273,10 +318,16 @@ public class MainWindow extends javax.swing.JFrame {
         deleteRawButton.setMinimumSize(new java.awt.Dimension(20, 20));
         deleteRawButton.setPreferredSize(new java.awt.Dimension(20, 20));
         deleteRawButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        deleteRawButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteRawButtonActionPerformed(evt);
+            }
+        });
         jToolBar1.add(deleteRawButton);
         jToolBar1.add(jSeparator1);
 
         copyRawButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_copy.png"))); // NOI18N
+        copyRawButton.setToolTipText("Copy the selected raw");
         copyRawButton.setBorder(null);
         copyRawButton.setFocusable(false);
         copyRawButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -284,9 +335,15 @@ public class MainWindow extends javax.swing.JFrame {
         copyRawButton.setMinimumSize(new java.awt.Dimension(20, 20));
         copyRawButton.setPreferredSize(new java.awt.Dimension(20, 20));
         copyRawButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        copyRawButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copyRawButtonActionPerformed(evt);
+            }
+        });
         jToolBar1.add(copyRawButton);
 
         pasteRawButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_paste.png"))); // NOI18N
+        pasteRawButton.setToolTipText("Paste the copied raw to the selected mod");
         pasteRawButton.setBorder(null);
         pasteRawButton.setFocusable(false);
         pasteRawButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -294,7 +351,20 @@ public class MainWindow extends javax.swing.JFrame {
         pasteRawButton.setMinimumSize(new java.awt.Dimension(20, 20));
         pasteRawButton.setPreferredSize(new java.awt.Dimension(20, 20));
         pasteRawButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        pasteRawButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pasteRawButtonActionPerformed(evt);
+            }
+        });
         jToolBar1.add(pasteRawButton);
+        jToolBar1.add(jSeparator2);
+
+        navigateRawToogleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_library.png"))); // NOI18N
+        navigateRawToogleButton.setSelected(true);
+        navigateRawToogleButton.setFocusable(false);
+        navigateRawToogleButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        navigateRawToogleButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(navigateRawToogleButton);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -310,10 +380,11 @@ public class MainWindow extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(modRawTree, javax.swing.GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE))
+                .addComponent(modRawTree, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE))
         );
 
-        modSaveButton.setText("Save");
+        modSaveButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_save.png"))); // NOI18N
+        modSaveButton.setToolTipText("Save this mod to the mods folder");
         modSaveButton.setEnabled(false);
         modSaveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -321,7 +392,8 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        modUndoButton.setText("Undo Changes");
+        modUndoButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_undo.png"))); // NOI18N
+        modUndoButton.setToolTipText("Undo changes");
         modUndoButton.setEnabled(false);
         modUndoButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -329,7 +401,8 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        modUpdateLocalButton.setText("Update Local");
+        modUpdateLocalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_navigate.png"))); // NOI18N
+        modUpdateLocalButton.setToolTipText("Update game mod files");
         modUpdateLocalButton.setEnabled(false);
         modUpdateLocalButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -337,11 +410,19 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        modPublishButton.setText("Publish");
+        modPublishButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_publish.png"))); // NOI18N
+        modPublishButton.setToolTipText("Prepares the selected mod to publish on steam");
         modPublishButton.setEnabled(false);
         modPublishButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 modPublishButtonActionPerformed(evt);
+            }
+        });
+
+        openModFolderButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/icon_folder.png"))); // NOI18N
+        openModFolderButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openModFolderButtonActionPerformed(evt);
             }
         });
 
@@ -355,12 +436,13 @@ public class MainWindow extends javax.swing.JFrame {
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, rightMainPanelLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(openModFolderButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(modPublishButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(modUpdateLocalButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(modUndoButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(modUpdateLocalButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(modSaveButton)))
                 .addContainerGap())
@@ -373,11 +455,13 @@ public class MainWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(rightMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(modSaveButton)
-                    .addComponent(modUndoButton)
-                    .addComponent(modUpdateLocalButton)
-                    .addComponent(modPublishButton))
+                .addGroup(rightMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(rightMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(modSaveButton)
+                        .addComponent(modUndoButton)
+                        .addComponent(modUpdateLocalButton)
+                        .addComponent(modPublishButton))
+                    .addComponent(openModFolderButton))
                 .addContainerGap())
         );
 
@@ -453,6 +537,50 @@ public class MainWindow extends javax.swing.JFrame {
         jMenu3.add(jMenuItem6);
 
         jMenuBar1.add(jMenu3);
+
+        jMenu4.setText("Help");
+
+        jMenuItem8.setText("Dwarf Fortress Wiki");
+        jMenuItem8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem8ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem8);
+
+        jMenuItem9.setText("Bay12 Forum");
+        jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem9ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem9);
+
+        jMenuItem10.setText("Dwarf Fortress Mod Maker Thread");
+        jMenuItem10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem10ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem10);
+
+        jMenuItem12.setText("Check for Updates");
+        jMenuItem12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem12ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem12);
+
+        jMenuItem11.setText("About");
+        jMenuItem11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem11ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem11);
+
+        jMenuBar1.add(jMenu4);
 
         setJMenuBar(jMenuBar1);
 
@@ -551,6 +679,126 @@ public class MainWindow extends javax.swing.JFrame {
         this.openOcurrenceLibrary();
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
+    private void copyRawButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyRawButtonActionPerformed
+        this.copyRaw();
+    }//GEN-LAST:event_copyRawButtonActionPerformed
+
+    private void pasteRawButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pasteRawButtonActionPerformed
+        this.pasteRaw();
+    }//GEN-LAST:event_pasteRawButtonActionPerformed
+
+    private void addRawButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addRawButtonActionPerformed
+        this.createRawFile();
+    }//GEN-LAST:event_addRawButtonActionPerformed
+
+    private void editRawButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editRawButtonActionPerformed
+        if (this.selectedMod != null && this.modRawTree.getTree().getLastSelectedPathComponent() != null) {
+            this.editRawFile();
+        }
+    }//GEN-LAST:event_editRawButtonActionPerformed
+
+    private void deleteRawButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteRawButtonActionPerformed
+        if (this.selectedMod != null && this.modRawTree.getTree().getLastSelectedPathComponent() != null) {
+            this.deleteRawFile();
+        }
+    }//GEN-LAST:event_deleteRawButtonActionPerformed
+
+    private void openModFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openModFolderButtonActionPerformed
+        if (this.selectedMod != null) {
+            try {
+                File file = new File(this.selectedMod.getModPath());
+                Desktop desktop = Desktop.getDesktop();
+                desktop.open(file);
+            } catch (IOException iOException) {
+            }
+        }
+    }//GEN-LAST:event_openModFolderButtonActionPerformed
+
+    private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
+        try {
+            // Create a URI object for the website you want to open
+            URI uri = new URI(Constants.FORUM);
+
+            // Check if the Desktop API is supported
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+
+                // Check if the browse() method is supported
+                if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                    // Open the default browser with the specified website
+                    desktop.browse(uri);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jMenuItem9ActionPerformed
+
+    private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
+        try {
+            // Create a URI object for the website you want to open
+            URI uri = new URI(Constants.WIKI);
+
+            // Check if the Desktop API is supported
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+
+                // Check if the browse() method is supported
+                if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                    // Open the default browser with the specified website
+                    desktop.browse(uri);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jMenuItem8ActionPerformed
+
+    private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
+        try {
+            // Create a URI object for the website you want to open
+            URI uri = new URI(Constants.THREAD);
+
+            // Check if the Desktop API is supported
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+
+                // Check if the browse() method is supported
+                if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                    // Open the default browser with the specified website
+                    desktop.browse(uri);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jMenuItem10ActionPerformed
+
+    private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
+        try {
+            // Create a URI object for the website you want to open
+            URI uri = new URI(Constants.REPO);
+
+            // Check if the Desktop API is supported
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+
+                // Check if the browse() method is supported
+                if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                    // Open the default browser with the specified website
+                    desktop.browse(uri);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jMenuItem12ActionPerformed
+
+    private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
+        final AboutWindow about = new AboutWindow(this, true, this.manager);
+        about.setVisible(true);
+    }//GEN-LAST:event_jMenuItem11ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addRawButton;
     private javax.swing.JButton copyRawButton;
@@ -564,18 +812,25 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem10;
+    private javax.swing.JMenuItem jMenuItem11;
+    private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JMenuItem jMenuItem8;
+    private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToolBar.Separator jSeparator1;
+    private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JPanel leftMainPanel;
     private javax.swing.JLabel modAuthorLabel;
@@ -589,7 +844,9 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JButton modUndoButton;
     private javax.swing.JButton modUpdateLocalButton;
     private javax.swing.JLabel modVersionLabel;
+    private javax.swing.JToggleButton navigateRawToogleButton;
     private javax.swing.JButton newModJButton;
+    private javax.swing.JButton openModFolderButton;
     private javax.swing.JButton pasteRawButton;
     private javax.swing.JPanel rightMainPanel;
     // End of variables declaration//GEN-END:variables
@@ -669,12 +926,14 @@ public class MainWindow extends javax.swing.JFrame {
                 .steamFileId("")
                 .modPath(this.manager.getPath() + Constants.MODS_FOLDER + "//" + name)
                 .type(ModType.MODMAKER)
+                .objects(new TreeSet<>())
+                .graphics(new TreeSet<>())
                 .build();
 
         try {
             Files.createDirectories(new File(mod.getModPath()).toPath());
             Files.createFile(new File(mod.getModPath() + "//" + Constants.MOD_MAKER_FILE).toPath());
-            Files.writeString(new File(mod.getModPath() + "//" + Constants.MOD_MAKER_FILE).toPath(), Constants.MOD_MAKER_GREETINGS + Constants.MOD_MAKER_VERSION);
+            Files.writeString(new File(mod.getModPath() + "//" + Constants.MOD_MAKER_FILE).toPath(), StringLibrary.APP_GREETINGS);
 
             ModWritter.writeInfo(this.manager, mod);
 
@@ -753,6 +1012,7 @@ public class MainWindow extends javax.swing.JFrame {
         this.addRawButton.setEnabled(enabled);
         this.editRawButton.setEnabled(enabled);
         this.deleteRawButton.setEnabled(enabled);
+        this.pasteRawButton.setEnabled(enabled);
     }
     
     //***********************************************************************************************************************************************************************
@@ -764,7 +1024,7 @@ public class MainWindow extends javax.swing.JFrame {
         if (this.selectedMod != null) {
             try {
                 ModWritter.writeInfo(this.manager, this.selectedMod);
-                //ModWritter.writeEntity(this.manager, this.selectedMod); TODO
+                ModWritter.writeEntity(this.manager, this.selectedMod);
                 JOptionPane.showMessageDialog(null, StringLibrary.MAIN_SAVE_SUCCESS, StringLibrary.GENERAL_SUCCESS, JOptionPane.PLAIN_MESSAGE);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, StringLibrary.MAIN_ERROR_SAVE_DATA + "\n" + e.getMessage(), StringLibrary.GENERAL_ERROR, JOptionPane.ERROR_MESSAGE);
@@ -893,5 +1153,173 @@ public class MainWindow extends javax.swing.JFrame {
         this.occurrenceLibrary.setVisible(true);
         this.occurrenceLibrary.setLocation(this.getLocationOnScreen().x - this.occurrenceLibrary.getWidth(), this.getLocationOnScreen().y);
         this.occurrenceLibrary.setSize(this.occurrenceLibrary.getWidth(), this.getHeight());
+    }
+
+    private void addTreeCopyPaste() {
+        KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
+        this.modRawTree.getTree().getInputMap().put(copyKeyStroke, "copy");
+        this.modRawTree.getTree().getActionMap().put("copy", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                copyRaw();
+            }
+        });
+
+        // create a KeyStroke for Ctrl+V and add a KeyListener to the textArea
+        KeyStroke pasteKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
+        this.modRawTree.getTree().getInputMap().put(pasteKeyStroke, "paste");
+        this.modRawTree.getTree().getActionMap().put("paste", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                pasteRaw();
+            }
+        });
+        
+        // create a KeyStroke for insert and add a KeyListener to the textArea
+        KeyStroke insertKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
+        this.modRawTree.getTree().getInputMap().put(insertKeyStroke, "new");
+        this.modRawTree.getTree().getActionMap().put("new", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                createRawFile();
+            }
+        });
+        
+        KeyAdapter keyAdapter = new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // Check if the Delete key is pressed
+                if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    if (selectedMod != null && modRawTree.getTree().getLastSelectedPathComponent() != null) {
+                        deleteRawFile();
+                    }
+                }
+            }
+        };
+        
+        this.modRawTree.getTree().addTreeSelectionListener(e -> {
+            if (!this.navigateRawToogleButton.isSelected()) {
+                return;
+            }
+            if (this.modRawTree.getTree().getLastSelectedPathComponent() != null) {
+                if (((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject() instanceof RawFile) {
+                    final RawFile raw = (RawFile) ((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject();
+                    this.occurrenceLibrary.navigateTo(raw.getType().name());
+                } else if (((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject() instanceof RawObject) {
+                    final RawObject raw = (RawObject) ((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject();
+                    final String[] tokens = RawFileReader.splitParameter(raw.getName());
+                    this.occurrenceLibrary.navigateTo(tokens[0]);
+                }
+            }
+            
+        });
+    }
+
+    private void copyRaw() {
+        if (this.modRawTree.getTree().getLastSelectedPathComponent() != null) {
+            if (((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject() instanceof RawFile) {
+                this.copyRawFileData = (RawFile) ((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject();
+                this.copyRawObjectData = null;
+            } else if (((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject() instanceof RawObject) {
+                this.copyRawObjectData = (RawObject) ((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject();
+                this.copyRawFileData = null;
+            }
+        }
+    }
+    
+    private void pasteRaw() {
+        if (this.selectedMod.getType() == ModType.MODMAKER) {
+            if (this.copyRawFileData != null) {
+                final RawFile clone = SerializationUtils.clone(this.copyRawFileData);
+                final String origName = clone.getName();
+                boolean duplicate = false;
+                int counter = 0;
+                while (true) {
+                    duplicate = false;
+                    if (clone.getType() == RawFileTypeEnum.GRAPHICS || clone.getType() == RawFileTypeEnum.TILE_PAGE) {
+                        for (RawFile raw : this.selectedMod.getGraphics()) {
+                            if (raw.getName().equalsIgnoreCase(clone.getName())) {
+                                duplicate = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!duplicate) {
+                            this.selectedMod.getGraphics().add(clone);
+                            break;
+                        }
+                    } else {
+                        for (RawFile raw : this.selectedMod.getObjects()) {
+                            if (raw.getName().equalsIgnoreCase(clone.getName())) {
+                                duplicate = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!duplicate) {
+                            this.selectedMod.getObjects().add(clone);
+                            break;
+                        }
+                    }
+                    counter++;
+                    clone.setName(origName + "_" + counter);
+                }
+                this.updateTree();
+            } else if (this.copyRawObjectData != null) {
+                RawFile parentFile = null;
+                RawObject parentObject = null;
+                
+                if (this.modRawTree.getTree().getLastSelectedPathComponent() != null) {
+                    if (this.modRawTree.getTree().getLastSelectedPathComponent() instanceof RawFile) {
+                        parentFile = (RawFile) this.modRawTree.getTree().getLastSelectedPathComponent();
+                    } else if (this.modRawTree.getTree().getLastSelectedPathComponent() instanceof RawObject) {
+                        parentObject = (RawObject) this.modRawTree.getTree().getLastSelectedPathComponent();
+                    }
+                } else {
+                    if (JOptionPane.showConfirmDialog(this, StringLibrary.MAIN_LOCAL_UPDATE_CONFIRMATION, StringLibrary.GENERAL_CONFIRMATION, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                        
+                    }
+                }
+            }
+        }
+    }
+
+    private void createRawFile() {
+        if (!this.rawCreator.isVisible() && this.selectedMod != null) {
+            this.rawCreator.setRawFile(this.selectedMod, RawFile.builder().build(), null, RawFileCreatorWindow.CREATE_MODE.NEW_RAW_FILE);
+            this.rawCreator.setVisible(true);
+        }
+    }
+
+    public void updateCreation(RawFileCreatorWindow.CREATE_MODE mode, boolean success) {
+        if (success) {
+            if ((mode == RawFileCreatorWindow.CREATE_MODE.NEW_RAW_FILE || mode == RawFileCreatorWindow.CREATE_MODE.EDIT_RAW_FILE) &&  this.selectedMod != null && this.selectedMod == this.rawCreator.getMod()) {
+                this.updateSelectedMod();
+            }
+        }
+    }
+
+    private void editRawFile() {
+        if (!this.rawCreator.isVisible()) {
+            if (this.modRawTree.getTree().getLastSelectedPathComponent() != null) {
+                if (((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject() instanceof RawFile) {
+                    final RawFile raw = (RawFile) ((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject();
+                    this.rawCreator.setRawFile(this.selectedMod, raw, null, RawFileCreatorWindow.CREATE_MODE.EDIT_RAW_FILE);
+                    this.rawCreator.setVisible(true);
+                } else if (((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject() instanceof RawObject) {
+                    final RawObject raw = (RawObject) ((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject();
+                }
+            }
+        }
+    }
+
+    private void deleteRawFile() {
+        if (JOptionPane.showConfirmDialog(this, StringLibrary.MAIN_RAW_FILE_CONFIRM_REMOVE, StringLibrary.GENERAL_CONFIRMATION, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            if (((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject() instanceof RawFile) {
+                final RawFile raw = (RawFile) ((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject();
+                this.selectedMod.getGraphics().remove(raw);
+                this.selectedMod.getObjects().remove(raw);
+            } else if (((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject() instanceof RawObject) {
+                final RawObject raw = (RawObject) ((DefaultMutableTreeNode) this.modRawTree.getTree().getLastSelectedPathComponent()).getUserObject();
+            }
+            this.updateSelectedMod();
+        }
     }
 }

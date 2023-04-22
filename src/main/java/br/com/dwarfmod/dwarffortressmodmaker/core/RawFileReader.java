@@ -10,15 +10,12 @@ import br.com.dwarfmod.dwarffortressmodmaker.data.RawFileTypeEnum;
 import br.com.dwarfmod.dwarffortressmodmaker.data.RawObject;
 import br.com.dwarfmod.dwarffortressmodmaker.data.library.Occurrence;
 import br.com.dwarfmod.dwarffortressmodmaker.data.library.OccurrenceLibrary;
-import br.com.dwarfmod.dwarffortressmodmaker.utils.ModFileUtils;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 public class RawFileReader {
@@ -27,7 +24,6 @@ public class RawFileReader {
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
         
         final RawFile rawFile = RawFile.builder().build();
-        rawFile.setFullPath(filePath);
         
         String line = null;
         int lineCount = 0;
@@ -62,10 +58,10 @@ public class RawFileReader {
 
                 } else if (structureCount <= 2 && line.trim().replaceAll("\t", "").startsWith("[")) {
                     structureCount = 3;
-                    object.setObjectClass(line.replace("\t", "").trim());
+                    object.setToken(line.replace("\t", "").trim());
                     
                     // Add file object class to library
-                    final String token = splitParameter(object.getObjectClass())[1];
+                    final String token = splitParameter(object.getToken())[1];
                     rootOcur.setToken(token);
                     if (!occurrenceLibrary.getOccurrenceList().containsKey(rootOcur.getToken())) {
                         occurrenceLibrary.getOccurrenceList().put(rootOcur.getToken(), rootOcur);
@@ -98,7 +94,7 @@ public class RawFileReader {
                         .entries(new TreeSet<>())
                         .name(line.replace("    ", "").replace("\t", ""))
                         .description("")
-                        .objectClass(object.getObjectClass())
+                        .token(object.getToken())
                         .build();
 
                     hier[level-1].getEntries().add(subObj);
@@ -137,16 +133,16 @@ public class RawFileReader {
                 lineCount++;
             }
         } catch (IOException e) {
-            System.out.println(rawFile.getFileName());
+            System.out.println(rawFile.getName());
             System.out.println(mod.getId());
             System.out.println(line);
         }
         reader.close();
         
-        rawFile.setId(hier[0].getName());
+        rawFile.setName(hier[0].getName());
         rawFile.setDescription(hier[0].getDescription());
-        rawFile.setType(RawFileTypeEnum.valueOf(hier[0].getObjectClass().substring(hier[0].getObjectClass().indexOf(":")+1, hier[0].getObjectClass().length()-1)));
-        rawFile.setObjects(hier[0].getEntries());
+        rawFile.setType(RawFileTypeEnum.valueOf(hier[0].getToken().substring(hier[0].getToken().indexOf(":")+1, hier[0].getToken().length()-1)));
+        rawFile.setEntries(hier[0].getEntries());
 
         return rawFile;
     }

@@ -4,31 +4,30 @@
  */
 package br.com.dwarfmod.dwarffortressmodmaker.data;
 
-import java.util.Set;
-import lombok.Builder;
+import java.io.Serializable;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 /**
  *
  * @author Ander
  */
 @Data
-@Builder
-public class RawFile implements Comparable<RawFile> {
-    private String fileName;
-    private String fullPath;
-    private String id;
-    private String description;
+@SuperBuilder
+public class RawFile extends RawObject implements Serializable {
     private RawFileTypeEnum type;
-    private Set<RawObject> objects;
-
-    @Override
-    public int compareTo(RawFile o) {
-        return this.getId().compareTo(o.getId());
-    }
     
     @Override
     public String toString() {
-        return this.getId();
+        return "<html><head></head><body>" + this.getName() + " <font color='#D3D3D3'>[" + type.name() + "]</font></body></html>";
+    }
+    
+    @Override
+    public int compareTo(Object o) {
+        if (o == null || !(o instanceof RawFile)) {
+            return -1;
+        } else {
+            return this.getName().compareTo(((RawFile) o).getName());
+        } 
     }
 }

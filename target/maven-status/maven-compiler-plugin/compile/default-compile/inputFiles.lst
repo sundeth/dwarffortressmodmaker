@@ -3,6 +3,7 @@ C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressMod
 C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\data\RawFileTypeEnum.java
 C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\gui\ModRawTreeModel.java
 C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\gui\OptionsDialog.java
+C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\gui\RawFileCreatorWindow.java
 C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\core\ModWritter.java
 C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\gui\MainWindow.java
 C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\gui\library\OccurrenceLibraryWindow.java
@@ -22,7 +23,7 @@ C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressMod
 C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\gui\library\OccurrenceLibraryTreeModel.java
 C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\utils\StringLibrary.java
 C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\data\Mod.java
-C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\gui\ModFileTreeCellRenderer.java
 C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\gui\ModRawTree.java
 C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\data\library\OccurrenceLibrary.java
+C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\gui\SplashScreen.java
 C:\Users\Ander\Documents\NetBeansProjects\dwarffortressmodmaker\DwarfFortressModMaker\src\main\java\br\com\dwarfmod\dwarffortressmodmaker\core\TableParser.java

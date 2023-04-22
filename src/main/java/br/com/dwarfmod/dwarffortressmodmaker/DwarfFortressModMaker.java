@@ -6,6 +6,7 @@ package br.com.dwarfmod.dwarffortressmodmaker;
 
 import br.com.dwarfmod.dwarffortressmodmaker.core.ModManager;
 import br.com.dwarfmod.dwarffortressmodmaker.gui.MainWindow;
+import br.com.dwarfmod.dwarffortressmodmaker.gui.SplashScreen;
 import br.com.dwarfmod.dwarffortressmodmaker.utils.Constants;
 import br.com.dwarfmod.dwarffortressmodmaker.utils.StringLibrary;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,7 +43,10 @@ public class DwarfFortressModMaker {
         try {
             Map<String, String> map = mapper.readValue(Paths.get(Constants.INIT_FILE).toFile(), Map.class);
             if (map.containsKey("dfFolder")) {
+                final SplashScreen splash = new SplashScreen();
+                splash.setVisible(true);
                 new MainWindow(ModManager.builder().path(map.get("dfFolder")).build()).setVisible(true);
+                splash.dispose();
             } else {
                 JOptionPane.showMessageDialog(null, StringLibrary.INIT_ERROR_JSON, "Erro", JOptionPane.ERROR_MESSAGE);
             }

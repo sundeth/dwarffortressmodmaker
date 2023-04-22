@@ -9,8 +9,7 @@ package br.com.dwarfmod.dwarffortressmodmaker.utils;
  * @author Ander
  */
 public class Constants {
-    public static final String VERSION = "2.1";
-    
+        
     public static final String VANILLA_FOLDER = "//data//vanilla";
     public static final String MODS_FOLDER = "//mods";
     public static final String STEAM_FOLDER = "//mods//mod_upload";
@@ -23,9 +22,11 @@ public class Constants {
     
     public static final String MOD_MAKER_FILE = "CreatedByModMaker.txt";
     
-    public static final String MOD_MAKER_GREETINGS = "This mod was created using Sundeth's Dwarf Mod Maker version ";
-    public static final String MOD_MAKER_VERSION = "1.0";
-    
     public static final String INIT_FILE = "ini.json";
     public static final String TOKEN_LIBRARY_FILE = "tokens.json";
+    
+    public static final String WIKI = "https://dwarffortresswiki.org/index.php";
+    public static final String FORUM = "http://www.bay12forums.com/smf/index.php";
+    public static final String THREAD = "http://www.bay12forums.com/smf/index.php?topic=181603.0";
+    public static final String REPO = "https://github.com/sundeth/dwarffortressmodmaker/releases";
 }

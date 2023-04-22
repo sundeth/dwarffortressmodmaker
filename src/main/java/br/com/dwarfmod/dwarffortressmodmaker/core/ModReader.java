@@ -56,7 +56,7 @@ public class ModReader {
                     }
                     builder.requiresIdBeforeMe(requiredIds);
                     builder.steamTags(steamTags);
-                    record = builder.objects(new TreeSet<>()).build();
+                    record = builder.objects(new TreeSet<>()).graphics(new TreeSet<>()).build();
                 }
             }
         } catch( Exception e) {

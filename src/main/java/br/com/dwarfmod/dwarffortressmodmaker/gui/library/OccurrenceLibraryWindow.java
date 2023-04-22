@@ -9,7 +9,11 @@ import br.com.dwarfmod.dwarffortressmodmaker.core.ResourcesReader;
 import br.com.dwarfmod.dwarffortressmodmaker.data.library.Occurrence;
 import br.com.dwarfmod.dwarffortressmodmaker.data.library.OccurrenceLibrary;
 import br.com.dwarfmod.dwarffortressmodmaker.gui.MainWindow;
+import java.util.Arrays;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 /**
  *
@@ -27,7 +31,7 @@ public class OccurrenceLibraryWindow extends javax.swing.JFrame {
     public OccurrenceLibraryWindow(final MainWindow mainWindow, final ModManager manager) {
         this.mainWindow = mainWindow;
         this.manager = manager;
-        
+
         this.initComponents();
     }
 
@@ -41,7 +45,7 @@ public class OccurrenceLibraryWindow extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        searchTextField = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         occurrenceTree = new javax.swing.JTree();
@@ -53,10 +57,17 @@ public class OccurrenceLibraryWindow extends javax.swing.JFrame {
 
         jLabel1.setText("Search");
 
+        searchTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                searchTextFieldKeyTyped(evt);
+            }
+        });
+
         jButton1.setText("Search");
 
         occurrenceTree.setBorder(javax.swing.BorderFactory.createTitledBorder("Tokens"));
         occurrenceTree.setModel(null);
+        occurrenceTree.setRootVisible(false);
         occurrenceTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 occurrenceTreeValueChanged(evt);
@@ -79,7 +90,7 @@ public class OccurrenceLibraryWindow extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                        .addComponent(searchTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton1))
                     .addComponent(jScrollPane2))
@@ -91,7 +102,7 @@ public class OccurrenceLibraryWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(searchTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -104,12 +115,17 @@ public class OccurrenceLibraryWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void occurrenceTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_occurrenceTreeValueChanged
-        final Occurrence selected = this.occurrenceTree.getLastSelectedPathComponent() != null ?
-                (Occurrence) ((DefaultMutableTreeNode) this.occurrenceTree.getLastSelectedPathComponent()).getUserObject() : null;
+        final Occurrence selected = this.occurrenceTree.getLastSelectedPathComponent() != null
+                ? (((DefaultMutableTreeNode) this.occurrenceTree.getLastSelectedPathComponent()).getUserObject() instanceof Occurrence ?
+                (Occurrence) ((DefaultMutableTreeNode) this.occurrenceTree.getLastSelectedPathComponent()).getUserObject() : null) : null;
         if (selected != null) {
             this.occurrenceList.setListData(selected.getValues().toArray(String[]::new));
         }
     }//GEN-LAST:event_occurrenceTreeValueChanged
+
+    private void searchTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchTextFieldKeyTyped
+        this.selectNodesWithText(searchTextField.getText(), true);
+    }//GEN-LAST:event_searchTextFieldKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -117,17 +133,75 @@ public class OccurrenceLibraryWindow extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JList<String> occurrenceList;
     private javax.swing.JTree occurrenceTree;
+    private javax.swing.JTextField searchTextField;
     // End of variables declaration//GEN-END:variables
 
     public OccurrenceLibrary getLibrary() {
         return library;
     }
-    
+
     public void refreshLibrary() {
         this.library = this.manager.getOccurrenceLibrary();
         this.occurrenceTree.setModel(new OccurrenceLibraryTreeModel(this.library));
+    }
+
+    public void navigateTo(final String text) {
+        this.searchTextField.setText(text);
+        this.selectNodesWithText(text, false);
+    }
+        
+    public void selectNodesWithText(String text, boolean contains) {
+        if (!this.isVisible()) {
+            return;
+        }
+        // Collapse the entire tree
+        this.collapseAll();
+
+        // Get the root node of the tree
+        DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) this.occurrenceTree.getModel().getRoot();
+
+        // Traverse the tree and expand and select the nodes that contain the given text
+        selectNodesWithTextHelper(rootNode, text, contains);
+        
+        //this.scrollToSelectedNode();
+    }
+
+    private void selectNodesWithTextHelper(DefaultMutableTreeNode node, String text, boolean contains) {
+        // Check if the node contains the given text
+        if ((!contains &&node.getUserObject().toString().equalsIgnoreCase(text)) || (contains &&node.getUserObject().toString().contains(text))) {
+            // Select the node
+            this.occurrenceTree.setSelectionPath(new TreePath(node.getPath()));
+            this.occurrenceTree.scrollPathToVisible(new TreePath(node.getPath()));
+
+            // Expand the node and its ancestors
+            TreeNode[] ancestors = node.getPath();
+            for (int i = 1; i < ancestors.length; i++) {
+                this.occurrenceTree.expandPath(new TreePath(Arrays.copyOfRange(ancestors, 0, i + 1)));
+            }
+        }
+
+        // Traverse the node's children recursively
+        for (int i = 0; i < node.getChildCount(); i++) {
+            DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) node.getChildAt(i);
+            selectNodesWithTextHelper(childNode, text, contains);
+        }
+    }
+
+    public void scrollToSelectedNode() {
+        // Get the selection path of the first selected node
+        TreePath selectedPath = this.occurrenceTree.getSelectionPath();
+
+        if (selectedPath != null) {
+            // Scroll the tree to the selected node
+            this.occurrenceTree.scrollPathToVisible(selectedPath);
+        }
+    }
+    
+    private void collapseAll() {
+        for (int i = this.occurrenceTree.getRowCount() - 1; i >= 0; i--) {
+            occurrenceTree.collapseRow(i);
+        }
     }
 }

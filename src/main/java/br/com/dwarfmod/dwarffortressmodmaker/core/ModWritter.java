@@ -5,6 +5,9 @@
 package br.com.dwarfmod.dwarffortressmodmaker.core;
 
 import br.com.dwarfmod.dwarffortressmodmaker.data.Mod;
+import br.com.dwarfmod.dwarffortressmodmaker.data.RawFile;
+import br.com.dwarfmod.dwarffortressmodmaker.data.RawObject;
+import br.com.dwarfmod.dwarffortressmodmaker.utils.Constants;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -43,7 +46,7 @@ public class ModWritter {
                 bw.newLine();
             }
         }
-        
+        bw.newLine();
         bw.write("[STEAM_TITLE:" + mod.getSteamTitle() + "]");
         bw.newLine();
         
@@ -63,97 +66,97 @@ public class ModWritter {
         fw.close();
     }
     
-//    public static void writeEntity(final ModManager install, final Mod mod) throws IOException {
-//        for (ModEntity entity : mod.getObjects()) {
-//            ModWritter.saveEntity(install, entity, mod);
-//        }
-//        for (ModEntity entity : mod.getGraphics()) {
-//            ModWritter.saveGraphics(install, entity, mod);
-//        }
-//    }
-//
-//    private static void saveEntity(final ModManager install, final ModEntity root, final Mod mod) throws IOException {
-//        new File(mod.getModPath() + Constants.OBJECTS_FOLDER).mkdir();
-//        
-//        File file = new File(mod.getModPath() + Constants.OBJECTS_FOLDER + "//" + root.getName() + ".txt");
-//        FileWriter fw = new FileWriter(file);
-//        BufferedWriter bw = new BufferedWriter(fw);
-//        
-//        bw.write(root.getName());
-//        bw.newLine();
-//        bw.newLine();
-//        
-//        if (root.getDescription() != null && !root.getDescription().isEmpty()) {
-//            bw.write(root.getDescription());
-//            bw.newLine();
-//            bw.newLine();
-//        }
-//        
-//        final String objClass = install.getCorrectObjectClass(root);
-//        bw.write(objClass.contains("]") ? objClass : "[OBJECT:" + install.getCorrectObjectClass(root) + "]");
-//        bw.newLine();
-//        bw.newLine();
-//        
-//        int level = 0;
-//        for (String ent : root.getEntries().keySet()) {
-//            ModWritter.saveChildrenEntities(bw, root.getEntries().get(ent), level);
-//            bw.newLine();
-//        }
-//        
-//        bw.close();
-//        fw.close();
-//    }
-//    
-//    private static void saveGraphics(final ModManager install, final ModEntity root, final Mod mod) throws IOException {
-//        new File(mod.getModPath() + Constants.GRAPHICS_FOLDER).mkdir();
-//        
-//        File file = new File(mod.getModPath() + Constants.GRAPHICS_FOLDER + "//" + root.getName() + ".txt");
-//        FileWriter fw = new FileWriter(file);
-//        BufferedWriter bw = new BufferedWriter(fw);
-//        
-//        bw.write(root.getName());
-//        bw.newLine();
-//        bw.newLine();
-//        
-//        if (root.getDescription() != null && !root.getDescription().isEmpty()) {
-//            bw.write(root.getDescription());
-//            bw.newLine();
-//            bw.newLine();
-//        }
-//        
-//        final String objClass = install.getCorrectObjectClass(root);
-//        bw.write(objClass.contains("]") ? objClass : "[OBJECT:" + install.getCorrectObjectClass(root) + "]");
-//        bw.newLine();
-//        bw.newLine();
-//        
-//        int level = 0;
-//        for (String ent : root.getEntries().keySet()) {
-//            ModWritter.saveChildrenEntities(bw, root.getEntries().get(ent), level);
-//            bw.newLine();
-//        }
-//        
-//        bw.close();
-//        fw.close();
-//    }
-//
-//    private static void saveChildrenEntities(BufferedWriter bw, ModEntity entity, int level) throws IOException {
-//        int levelAux = level;
-//        String line = "";
-//        while (levelAux > 0) {
-//            line += "   ";
-//            levelAux--;
-//        }
-//        if (entity.getDescription() != null && !entity.getDescription().isEmpty()) {
-//            bw.write(line + entity.getDescription());
-//            bw.newLine();
-//        }
-//        bw.write(line + entity.getName());
-//        bw.newLine();
-//        if (entity.getEntries() != null && !entity.getEntries().isEmpty()) {
-//            level += 1;
-//            for (String ent : entity.getEntries().keySet()) {
-//                ModWritter.saveChildrenEntities(bw, entity.getEntries().get(ent), level);
-//            }
-//        }
-//    }
+    public static void writeEntity(final ModManager install, final Mod mod) throws IOException {
+        for (RawFile entity : mod.getObjects()) {
+            ModWritter.saveEntity(install, entity, mod);
+        }
+        for (RawFile entity : mod.getGraphics()) {
+            ModWritter.saveGraphics(install, entity, mod);
+        }
+    }
+
+    private static void saveEntity(final ModManager install, final RawFile root, final Mod mod) throws IOException {
+        new File(mod.getModPath() + Constants.OBJECTS_FOLDER).mkdir();
+        
+        File file = new File(mod.getModPath() + Constants.OBJECTS_FOLDER + "//" + root.getName() + ".txt");
+        FileWriter fw = new FileWriter(file);
+        BufferedWriter bw = new BufferedWriter(fw);
+        
+        bw.write(root.getName());
+        bw.newLine();
+        bw.newLine();
+        
+        if (root.getDescription() != null && !root.getDescription().isEmpty()) {
+            bw.write(root.getDescription());
+            bw.newLine();
+            bw.newLine();
+        }
+        
+        final String objClass = root.getType().name();
+        bw.write(objClass.contains("]") ? objClass : "[OBJECT:" + root.getType().name() + "]");
+        bw.newLine();
+        bw.newLine();
+        
+        int level = 0;
+        for (RawObject ent : root.getEntries()) {
+            ModWritter.saveChildrenEntities(bw, ent, level);
+            bw.newLine();
+        }
+        
+        bw.close();
+        fw.close();
+    }
+    
+    private static void saveGraphics(final ModManager install, final RawFile root, final Mod mod) throws IOException {
+        new File(mod.getModPath() + Constants.GRAPHICS_FOLDER).mkdir();
+        
+        File file = new File(mod.getModPath() + Constants.GRAPHICS_FOLDER + "//" + root.getName() + ".txt");
+        FileWriter fw = new FileWriter(file);
+        BufferedWriter bw = new BufferedWriter(fw);
+        
+        bw.write(root.getName());
+        bw.newLine();
+        bw.newLine();
+        
+        if (root.getDescription() != null && !root.getDescription().isEmpty()) {
+            bw.write(root.getDescription());
+            bw.newLine();
+            bw.newLine();
+        }
+        
+        final String objClass = root.getType().name();
+        bw.write(objClass.contains("]") ? objClass : "[OBJECT:" + root.getType().name() + "]");
+        bw.newLine();
+        bw.newLine();
+        
+        int level = 0;
+        for (RawObject ent : root.getEntries()) {
+            ModWritter.saveChildrenEntities(bw, ent, level);
+            bw.newLine();
+        }
+        
+        bw.close();
+        fw.close();
+    }
+
+    private static void saveChildrenEntities(BufferedWriter bw, RawObject entity, int level) throws IOException {
+        int levelAux = level;
+        String line = "";
+        while (levelAux > 0) {
+            line += "   ";
+            levelAux--;
+        }
+        if (entity.getDescription() != null && !entity.getDescription().isEmpty()) {
+            bw.write(line + entity.getDescription());
+            bw.newLine();
+        }
+        bw.write(line + entity.getName());
+        bw.newLine();
+        if (entity.getEntries() != null && !entity.getEntries().isEmpty()) {
+            level += 1;
+            for (RawObject ent : entity.getEntries()) {
+                ModWritter.saveChildrenEntities(bw, ent, level);
+            }
+        }
+    }
 }

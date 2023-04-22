@@ -11,6 +11,9 @@ package br.com.dwarfmod.dwarffortressmodmaker.utils;
 public class StringLibrary {
     public static final String APP_NAME = "Dwarf Fortress Mod Maker";
     public static final String APP_NAME2 = "D.F.M.M.";
+    public static final String APP_VERSION = "1.1";
+    public static final String APP_GREETINGS = "This mod was created using " + APP_NAME + " version " + APP_VERSION;
+    
     
     public static final String INIT_INSTALLATION_TITLE = "Select the main path to yor Dwarf Fortress Installation";
     public static final String INIT_ERROR_JSON = "Error reading init.json, check file.";
@@ -37,6 +40,11 @@ public class StringLibrary {
     public static final String MAIN_LOCAL_UPDATE_BAD_MOD = "Only mods created by this tool can be updated and/or published.";
     public static final String MAIN_PUBLISH_CONFIRMATION = "This will copy this mod to the mod_upload folder.\nYou will need to start the game to actually send the files.\nDo you want to proceed?";
     public static final String MAIN_PUBLISH_SUCESS = "Steam folder updated. Run the game to upload files.";
+    public static final String MAIN_PASTE_CREATION_QUESTION = "No Raw File selected. Do you like to create a new one?";
+    
+    public static final String MAIN_RAW_FILE_CONFIRM_REMOVE = "Are you sure you want to remove this entity?";
+    public static final String MAIN_RAW_FILE_EMPTY_ID = "The new raw file requires a name";
+    public static final String MAIN_RAW_FILE_EMPTY_DUPLICATED = "This mod already has a raw file with this name";
     
     public static final String MAIN_LIBRARY_UPDATE = "WARNING! This operation will replace your local raw structure file.\nMake sure you are connected to the internet.\nDo you want to proceed?";
     public static final String MAIN_LIBRARY_ERROR = "It was not possible to update the library, check your connection and try again.";
