@@ -12,7 +12,7 @@
             <properties>
                 <exec.vmArgs></exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs>SplashScreen-Image: resources/images/splash.png</exec.appArgs>
+                <exec.appArgs></exec.appArgs>
                 <exec.mainClass>br.com.dwarfmod.dwarffortressmodmaker.DwarfFortressModMaker</exec.mainClass>
                 <exec.executable>java</exec.executable>
             </properties>
@@ -29,7 +29,7 @@
             <properties>
                 <exec.vmArgs>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs>SplashScreen-Image: resources/images/splash.png</exec.appArgs>
+                <exec.appArgs></exec.appArgs>
                 <exec.mainClass>br.com.dwarfmod.dwarffortressmodmaker.DwarfFortressModMaker</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
@@ -49,7 +49,14 @@
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.mainClass>br.com.dwarfmod.dwarffortressmodmaker.DwarfFortressModMaker</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.appArgs>SplashScreen-Image: resources/images/splash.png</exec.appArgs>
+                <exec.appArgs></exec.appArgs>
             </properties>
+        </action>
+        <action>
+            <actionName>CUSTOM-install</actionName>
+            <displayName>install</displayName>
+            <goals>
+                <goal>install:install</goal>
+            </goals>
         </action>
     </actions>

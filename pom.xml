@@ -3,8 +3,38 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>br.com.dwarfmod</groupId>
     <artifactId>DwarfFortressModMaker</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1</version>
     <packaging>jar</packaging>
+    <name>Dwarf Fortress Mod Maker</name>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>br.com.dwarfmod.dwarffortressmodmaker.DwarfFortressModMaker</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>                         
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
+            
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
@@ -55,5 +85,4 @@
             <version>1.14.3</version>
         </dependency>
     </dependencies>
-    <name>Dwarf Fortress Mod Maker</name>
 </project>
